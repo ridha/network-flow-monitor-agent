@@ -2,7 +2,8 @@
 name = "nfm-common"
 version = "0.1.0"
 edition = "2021"
-publish = false
+license = "Apache-2.0"
+repository = "https://github.com/aws/network-flow-monitor-agent"
 
 [dependencies]
 aya = { version = "0.13", optional = true }
