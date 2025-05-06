@@ -64,6 +64,9 @@ docker build -t integration-tests -f test-data/Dockerfile.test .
 docker run --privileged -t integration-tests
 ```
 
+### Distributions
+You can download the official release from our permanent URLs. For more information, refer to [link](https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-NetworkFlowMonitor-agents-download-agent-commandline.html)
+
 ## License
 
 This project is licensed under the Apache 2.0 License.
