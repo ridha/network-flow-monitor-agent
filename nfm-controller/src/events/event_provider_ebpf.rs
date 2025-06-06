@@ -31,6 +31,7 @@ use procfs::{Current, Meminfo};
 use std::cmp::min;
 use std::fs::File;
 use std::mem;
+use std::mem::size_of;
 
 pub struct EventProviderEbpf<C: Clock> {
     ebpf_handle: Ebpf,
@@ -39,6 +40,7 @@ pub struct EventProviderEbpf<C: Clock> {
     ebpf_control_data: ControlData,
     ebpf_counters_latest: EventCounters,
     ebpf_counters_published: EventCounters,
+    ebpf_allocated_mem_kb: u32,
 
     process_counters: ProcessCounters,
     notrack_us: u64,
@@ -84,6 +86,15 @@ pub fn map_max_entries(mem_total_bytes: u64) -> (u64, u64) {
         .clamp(MAX_ENTRIES_SK_STATS_LO, MAX_ENTRIES_SK_STATS_HI);
 
     (sock_props_max_entries, sock_stats_max_entries)
+}
+
+fn calculate_ebpf_memory_usage(sock_props_max_entries: u64, sock_stats_max_entries: u64) -> u32 {
+    let sock_context_size = size_of::<CpuSockKey>() + size_of::<SockContext>();
+    let sock_stats_size = size_of::<CpuSockKey>() + size_of::<SockStats>();
+    (((sock_props_max_entries * sock_context_size as u64)
+        + (sock_stats_max_entries * sock_stats_size as u64)) as f64
+        / 1000.0)
+        .ceil() as u32
 }
 
 impl<C: Clock> EventProvider for EventProviderEbpf<C> {
@@ -208,6 +219,11 @@ impl<C: Clock> EventProvider for EventProviderEbpf<C> {
     fn socket_count(&self) -> u64 {
         self.agg_socks_handled
     }
+
+    // Gets the memory usage by ebpf program, static value
+    fn ebpf_allocated_mem_kb(&self) -> u32 {
+        self.ebpf_allocated_mem_kb
+    }
 }
 
 impl<C: Clock> EventProviderEbpf<C> {
@@ -245,6 +261,11 @@ impl<C: Clock> EventProviderEbpf<C> {
                 .context(format!("Failed to load BPF map {}", NFM_SK_STATS_MAP_NAME))?;
 
         let max_concurrent_socks = sock_props_max_entries;
+        let ebpf_allocated_mem_kb =
+            calculate_ebpf_memory_usage(sock_props_max_entries, sock_stats_max_entries);
+
+        info!(ebpf_allocated_mem_kb; "Calculated BPF maps approximate memory usage");
+
         let mut provider = EventProviderEbpf {
             ebpf_handle,
             ebpf_sock_props,
@@ -252,6 +273,7 @@ impl<C: Clock> EventProviderEbpf<C> {
             ebpf_control_data: ControlData::default(),
             ebpf_counters_latest: EventCounters::default(),
             ebpf_counters_published: EventCounters::default(),
+            ebpf_allocated_mem_kb,
             process_counters: ProcessCounters {
                 restarts: 1,
                 ..Default::default()
@@ -435,7 +457,9 @@ impl SocketQueries {
 
 #[cfg(test)]
 mod test {
-    use crate::events::event_provider_ebpf::{map_max_entries, SocketQueries};
+    use crate::events::event_provider_ebpf::{
+        calculate_ebpf_memory_usage, map_max_entries, SocketQueries,
+    };
     use crate::events::network_event::{AggregateResults, FlowProperties, InetProtocol};
     use crate::events::{AggSockStats, SockCache, SockOperationResult};
     use nfm_common::constants::{
@@ -859,5 +883,12 @@ mod test {
                 }
             );
         }
+    }
+
+    #[test]
+    fn test_calculate_ebpf_memory_usage_max() {
+        // Will deliberately break at sock struct changes and provide a manual review step
+        let result = calculate_ebpf_memory_usage(MAX_ENTRIES_SK_PROPS_HI, MAX_ENTRIES_SK_STATS_HI);
+        assert!(result == 8080);
     }
 }

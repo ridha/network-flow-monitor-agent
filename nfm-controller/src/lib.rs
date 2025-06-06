@@ -310,6 +310,7 @@ fn do_work(
             usage_stats.mem_used_kb = usage_stats.mem_used_kb.max(mem_used_kb);
             usage_stats.mem_used_ratio = usage_stats.mem_used_ratio.max(mem_used_ratio);
             usage_stats.sockets_tracked = usage_stats.sockets_tracked.max(provider.socket_count());
+            usage_stats.ebpf_allocated_mem_kb = provider.ebpf_allocated_mem_kb();
         }
     }
 }
@@ -368,6 +369,9 @@ mod test {
             CountersOverall::default()
         }
         fn socket_count(&self) -> u64 {
+            0
+        }
+        fn ebpf_allocated_mem_kb(&self) -> u32 {
             0
         }
     }

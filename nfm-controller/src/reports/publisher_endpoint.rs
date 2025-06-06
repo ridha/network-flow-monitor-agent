@@ -695,6 +695,7 @@ mod tests {
             mem_used_kb: 512,
             mem_used_ratio: 0.06,
             sockets_tracked: 100,
+            ebpf_allocated_mem_kb: 12801,
         });
 
         process_stats

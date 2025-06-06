@@ -722,6 +722,24 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "ebpf_allocated_mem_kb",
+              "description": "",
+              "unit": "",
+              "metadata": [],
+              "gauge": {
+                "dataPoints": [
+                  {
+                    "attributes": [],
+                    "startTimeUnixNano": "1718716821050000",
+                    "timeUnixNano": "1718716821050000",
+                    "exemplars": [],
+                    "flags": 0,
+                    "asInt": 12802
+                  }
+                ]
+              }
             }
           ],
           "schemaUrl": ""

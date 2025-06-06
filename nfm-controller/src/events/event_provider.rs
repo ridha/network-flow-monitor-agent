@@ -13,4 +13,5 @@ pub trait EventProvider {
     fn network_stats(&mut self) -> Vec<AggregateResults>;
     fn counters(&mut self) -> CountersOverall;
     fn socket_count(&self) -> u64;
+    fn ebpf_allocated_mem_kb(&self) -> u32;
 }

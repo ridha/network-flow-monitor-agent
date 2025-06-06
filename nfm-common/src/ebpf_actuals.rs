@@ -58,20 +58,20 @@ pub type SharedHashMap<K, V> = aya_ebpf::maps::HashMap<K, V>;
 pub static NFM_CONTROL: SharedHashMap<SingletonKey, ControlData> =
     SharedHashMap::with_max_entries(1, BPF_F_NO_PREALLOC);
 
-// NFM_COUNTERS communicates events from BPF to user-space.  It is per-CPU and contents are never
+// NFM_COUNTERS communicates events from BPF to user-space. It is per-CPU and contents are never
 // deleted.
 #[map]
 pub static NFM_COUNTERS: PerCpuHashMap<SingletonKey, EventCounters> =
     PerCpuHashMap::with_max_entries(1, 0);
 
-// SK_PROPS communicates the properties of a newly established socket to user-space.  It is used as
+// SK_PROPS communicates the properties of a newly established socket to user-space. It is used as
 // a signaling channel; entries are deleted by user-space once read.
 #[map]
 pub static NFM_SK_PROPS: SharedHashMap<CpuSockKey, SockContext> =
     SharedHashMap::with_max_entries(MAX_ENTRIES_SK_PROPS_LO as u32, BPF_F_NO_PREALLOC);
 
 // SK_STATS is where the BPF program writes socket statistics in response to sock_ops events for
-// tracked sockets.  Entries are deleted by user-space upon socket closure.
+// tracked sockets. Entries are deleted by user-space upon socket closure.
 #[map]
 pub static NFM_SK_STATS: SharedHashMap<CpuSockKey, SockStats> =
     SharedHashMap::with_max_entries(MAX_ENTRIES_SK_STATS_LO as u32, BPF_F_NO_PREALLOC);

@@ -147,6 +147,7 @@ pub struct UsageStats {
     pub mem_used_kb: u64,
     pub mem_used_ratio: f64,
     pub sockets_tracked: u64,
+    pub ebpf_allocated_mem_kb: u32,
 }
 
 impl ProcessStats {
@@ -242,6 +243,7 @@ mod tests {
             mem_used_kb: 512,
             mem_used_ratio: 0.06,
             sockets_tracked: 49,
+            ebpf_allocated_mem_kb: 12800,
         });
         let grouped_iface_stats = GroupedInterfaceStats {
             interface_id: "iface-id-1".to_string(),
