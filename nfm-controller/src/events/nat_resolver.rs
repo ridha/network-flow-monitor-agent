@@ -186,7 +186,7 @@ impl NatResolverImpl {
                 is_client,
                 ..Default::default()
             },
-            _ => panic!("Found NAT entry of differing IP families: {:?}", cxn_info),
+            _ => panic!("Found NAT entry of differing IP families: {cxn_info:?}"),
         }
     }
 }

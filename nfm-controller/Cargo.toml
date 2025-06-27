@@ -78,7 +78,7 @@ shadow-rs = "0.36"
 signal-hook = "0.3"
 structured-logger = "1.0"
 sys-info = "0.9"
-tokio = { version = "1.25", features = [
+tokio = { version = "1.45.1", features = [
     "fs",
     "macros",
     "rt",
@@ -92,3 +92,4 @@ url = "2.5"
 cargo_metadata = "0.19"
 shadow-rs = "0.36"
 which = { version = "6.0.0", default-features = false }
+

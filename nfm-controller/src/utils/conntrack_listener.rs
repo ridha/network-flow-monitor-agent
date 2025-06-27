@@ -100,8 +100,7 @@ impl ConntrackListener {
                                 Ok(cxn) => orig_opt = Some(cxn),
                                 Err(e) => {
                                     return Err(format!(
-                                        "Failed to extract original connection properties: {:?}",
-                                        e
+                                        "Failed to extract original connection properties: {e:?}"
                                     ));
                                 }
                             }
@@ -111,8 +110,7 @@ impl ConntrackListener {
                                 Ok(cxn) => reply_opt = Some(cxn),
                                 Err(e) => {
                                     return Err(format!(
-                                        "Failed to extract reply connection properties: {:?}",
-                                        e
+                                        "Failed to extract reply connection properties: {e:?}",
                                     ));
                                 }
                             }
@@ -141,7 +139,7 @@ impl ConntrackProvider for ConntrackListener {
                     break;
                 }
                 Err(e) => {
-                    return Err(format!("Failed to read from netlink socket: {:?}", e));
+                    return Err(format!("Failed to read from netlink socket: {e:?}"));
                 }
                 _ => {}
             }

@@ -181,7 +181,7 @@ pub fn on_load(opt: Options) -> Result<(), anyhow::Error> {
 
     // Drop capabilities now that eBPF program is loaded and attached
     if let Err(e) = drop_capabilities() {
-        warn!("Failed to drop capabilities: {}", e);
+        warn!("Failed to drop capabilities: {e}");
     }
 
     let nat_resolver: Box<dyn NatResolver> = if opt.resolve_nat == OnOff::On {

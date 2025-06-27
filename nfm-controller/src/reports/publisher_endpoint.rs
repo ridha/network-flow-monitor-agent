@@ -153,7 +153,7 @@ where
         let credentials = match rt.block_on(self.credentials_provider.provide_credentials()) {
             Ok(credentials) => credentials,
             Err(e) => {
-                error!("Error getting credentials: {}", e);
+                error!("Error getting credentials: {e}");
                 return false;
             }
         };
@@ -187,7 +187,7 @@ where
         {
             Ok(res) => res,
             Err(e) => {
-                error!("Error sending request: {}", e);
+                error!("Error sending request: {e}");
                 return false;
             }
         };
@@ -207,7 +207,7 @@ fn get_host(url: &str) -> String {
     match Url::parse(url) {
         Ok(url) => url.host().unwrap().to_string(),
         Err(e) => {
-            error!("Error parsing url: {}", e);
+            error!("Error parsing url: {e}");
             "".to_string()
         }
     }

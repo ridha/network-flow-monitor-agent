@@ -228,13 +228,12 @@ impl<C: Clock> EventProvider for EventProviderEbpf<C> {
 
 impl<C: Clock> EventProviderEbpf<C> {
     pub fn new(cgroup: &String, notrack_secs: u64, clock: C) -> Result<Self> {
-        let cgroup_file =
-            File::open(cgroup).context(format!("cgroup file not found: {}", cgroup))?;
+        let cgroup_file = File::open(cgroup).context(format!("cgroup file not found: {cgroup}"))?;
 
         let mem_total_bytes = match Meminfo::current() {
             Ok(meminfo) => meminfo.mem_total,
             Err(e) => {
-                panic!("Unable to determine total memory: {}", e);
+                panic!("Unable to determine total memory: {e}");
             }
         };
         let (sock_props_max_entries, sock_stats_max_entries) = map_max_entries(mem_total_bytes);
@@ -251,14 +250,14 @@ impl<C: Clock> EventProviderEbpf<C> {
             .context("Failed to load sockops program into the kernel")?;
         program
             .attach(cgroup_file, CgroupAttachMode::Single)
-            .context(format!("Failed to attach to cgroup: {}", cgroup))?;
+            .context(format!("Failed to attach to cgroup: {cgroup}"))?;
 
         let ebpf_sock_props =
             SharedHashMap::try_from(ebpf_handle.take_map(NFM_SK_PROPS_MAP_NAME).unwrap())
-                .context(format!("Failed to load BPF map {}", NFM_SK_PROPS_MAP_NAME))?;
+                .context(format!("Failed to load BPF map {NFM_SK_PROPS_MAP_NAME}"))?;
         let ebpf_sock_stats =
             SharedHashMap::try_from(ebpf_handle.take_map(NFM_SK_STATS_MAP_NAME).unwrap())
-                .context(format!("Failed to load BPF map {}", NFM_SK_STATS_MAP_NAME))?;
+                .context(format!("Failed to load BPF map {NFM_SK_STATS_MAP_NAME}"))?;
 
         let max_concurrent_socks = sock_props_max_entries;
         let ebpf_allocated_mem_kb =
@@ -317,9 +316,9 @@ impl<C: Clock> EventProviderEbpf<C> {
 
     fn send_control_data(&mut self) {
         SharedHashMap::try_from(self.ebpf_handle.map_mut(NFM_CONTROL_MAP_NAME).unwrap())
-            .unwrap_or_else(|_| panic!("Failed to load BPF map {}", NFM_CONTROL_MAP_NAME))
+            .unwrap_or_else(|_| panic!("Failed to load BPF map {NFM_CONTROL_MAP_NAME}"))
             .insert(SINGLETON_KEY, self.ebpf_control_data, BPF_ANY.into())
-            .unwrap_or_else(|e| panic!("Failed to write control data: {:?}", e))
+            .unwrap_or_else(|e| panic!("Failed to write control data: {e:?}"))
     }
 
     fn process_counters(&mut self) -> ProcessCounters {
@@ -332,7 +331,7 @@ impl<C: Clock> EventProviderEbpf<C> {
     fn ebpf_counters(&mut self) -> EventCounters {
         let data: PerCpuHashMap<&MapData, SingletonKey, EventCounters> =
             PerCpuHashMap::try_from(self.ebpf_handle.map(NFM_COUNTERS_MAP_NAME).unwrap())
-                .unwrap_or_else(|_| panic!("Failed to load BPF map {}", NFM_COUNTERS_MAP_NAME));
+                .unwrap_or_else(|_| panic!("Failed to load BPF map {NFM_COUNTERS_MAP_NAME}"));
 
         let mut new_counters = EventCounters::default();
         const EMPTY_FLAGS: u64 = 0;

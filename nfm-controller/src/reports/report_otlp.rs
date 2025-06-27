@@ -74,7 +74,7 @@ fn build_metric_histogram(
             data_point.sum = Some(histo.sum as f64);
         }
         _ => {
-            return Err(format!("Unsupported value type {:?}", value).to_string());
+            return Err(format!("Unsupported value type {value:?}").to_string());
         }
     }
 
@@ -111,7 +111,7 @@ fn build_metric_gauge(
             data_point.value = Some(number_data_point::Value::AsInt(value as i64));
         }
         _ => {
-            return Err(format!("Unsupported value type {:?}", value).to_string());
+            return Err(format!("Unsupported value type {value:?}").to_string());
         }
     }
 
@@ -143,7 +143,7 @@ fn build_metric_sum(name: String, timestamp_ns: u64, value: ReportValue) -> Resu
             data_point.value = Some(number_data_point::Value::AsInt(value as i64));
         }
         _ => {
-            return Err(format!("Unsupported value type {:?}", value).to_string());
+            return Err(format!("Unsupported value type {value:?}").to_string());
         }
     }
 
