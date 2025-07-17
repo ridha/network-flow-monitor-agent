@@ -107,6 +107,8 @@ echo "%{AGENT_LOG_DESCRIPTION} uninstalled successfully."
 
 ### Post-Uninstall Scripts
 %postun
+# The agent needs to be restarted upon upgrade to pick up the new binary
+%systemd_postun_with_restart network-flow-monitor.service
 if [ %PACKAGES_LEFT = 0 ] || [ %PACKAGE_COMMAND = "remove" ]; then
     userdel %{NFM_USER}
     groupdel %{NFM_GROUP}
