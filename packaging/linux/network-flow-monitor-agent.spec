@@ -83,7 +83,15 @@ if [ %PACKAGES_LEFT = 1 ] || ! mountpoint -q %{NFM_CGROUP_DIR}; then
 fi
 
 ## Service start + enable on startup
-systemctl start network-flow-monitor.service
+# $1 = 1 for fresh install
+# $1 = 2 for upgrade
+# All other values are invalid for %post scriptlet - https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/
+if [ $1 -eq 1 ]; then
+    systemctl start network-flow-monitor.service
+elif [ $1 -eq 2 ]; then
+    echo "Restarting network-flow-monitor-agent"
+    systemctl try-restart network-flow-monitor.service
+fi
 systemctl enable network-flow-monitor.service
 
 echo "%{AGENT_LOG_DESCRIPTION} installed successfully."
@@ -107,8 +115,6 @@ echo "%{AGENT_LOG_DESCRIPTION} uninstalled successfully."
 
 ### Post-Uninstall Scripts
 %postun
-# The agent needs to be restarted upon upgrade to pick up the new binary
-%systemd_postun_with_restart network-flow-monitor.service
 if [ %PACKAGES_LEFT = 0 ] || [ %PACKAGE_COMMAND = "remove" ]; then
     userdel %{NFM_USER}
     groupdel %{NFM_GROUP}
