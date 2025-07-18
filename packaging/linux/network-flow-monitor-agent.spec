@@ -84,13 +84,13 @@ fi
 
 ## Service start + enable on startup
 # $1 = 1 for fresh install
-# $1 = 2 for upgrade
-# All other values are invalid for %post scriptlet - https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/
-if [ $1 -eq 1 ]; then
-    systemctl start network-flow-monitor.service
-elif [ $1 -eq 2 ]; then
+# $1 >= 2 for upgrade
+# https://docs.fedoraproject.org/en-US/packaging-guidelines/Scriptlets/
+if [ $1 -ge 2 ]; then
     echo "Restarting network-flow-monitor-agent"
     systemctl try-restart network-flow-monitor.service
+else
+    systemctl start network-flow-monitor.service
 fi
 systemctl enable network-flow-monitor.service
 
